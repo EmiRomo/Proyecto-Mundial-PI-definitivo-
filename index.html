@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  </head>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: white;
+      color: rgb(0, 0, 0);
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+    }
+        
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 20px 0;
+      margin-bottom: 30px;
+      height: 65px;
+      background-image: url('assets/targets/img-originales/header.png');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 100%;
+    }
+    
+    .header-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 1200px;
+      width: 100%;
+      padding: 0 20px;
+    }
+    
+    .header-title {
+      font-size: 2.5rem;
+      margin: 0;
+      color: rgb(0, 0, 0);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    }
+    
+    .header-subtitle {
+      font-size: 1.4rem;
+      margin-top: 10px;
+      color: #0270d6;
+      font-weight: 300;
+    }
+    
+    .logo {
+      height: 100%; 
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo-img {
+      height: 60px;
+      width: auto; 
+      max-width: 200px; 
+    }
+        
+    .content-section {
+      display: flex;
+      flex: 1;
+      gap: 40px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+        
+    .text-content {
+      flex: 1;
+      min-width: 300px;
+    }
+    
+    .image-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-width: 300px;
+    }
+    
+    .image-content img {
+      max-width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    h1 {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      color: #000000;
+    }
+    
+    p {
+      line-height: 1.6;
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+      color: #000000;
+    }
+    
+    .cta-section {
+      text-align: center;
+      margin-top: auto;
+      padding: 25px;
+      width: 100%;
+    }
+          
+    .cta-text {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: #000000;
+    }
+
+    .buttons-main {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .cta-button {
+      padding: 20px;
+      font-size: 1.2rem;
+      border-radius: 10%;
+      background: #fd2929;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+      box-shadow: 0 5px 15px rgba(0, 191, 255, 0.4);
+      width: 150px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 40px;
+    }
+    
+    .cta-button:hover {
+      background: #04d662; 
+    }
+      
+    .camera-icon {
+      font-size: 2.5rem;
+    }
+
+    /*-----------------FOOTER-----------------------*/
+    .footer-content {
+      display: flex;
+      justify-content: center;  
+      align-items: center;     
+      gap: 20px;               
+      flex-wrap: wrap;
+      background-color: #000000; 
+      color: #ddd;       
+      margin-top: 40px;
+      font-size: 0.85rem;  
+    }
+
+    .footer-content h2 {
+      margin: 0; 
+    }
+
+    @media (max-width: 768px) {
+      footer {
+        font-size: 0.8rem;
+        padding: 15px 5px;
+      }
+    }
+    /*---------------Contenedor AR-----------------*/
+    #ar-container {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      position: fixed;
+      top: 0; left: 0;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      z-index: 1;
+    }
+    
+    #ar-container.active {
+      display: block; 
+      opacity: 1;
+    }
+
+    #buttons-panel {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      gap: 10px;
+      z-index: 20;
+    }
+
+    #buttons-panel button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background: #fd2929;
+      color: white;
+      cursor: pointer;
+    }
+
+    #infoBox {
+      position: absolute;
+      top: 30%;
+      left: 17%;
+      transform: translateX(-50%);
+      background: url("assets/targets/img-originales/CuadreInfo.png") no-repeat center center;
+      background-color: rgba(0,0,0,0);
+      background-size: contain;
+      background-position: center;
+      display: none;
+      z-index: 25;
+      width: 370px;  
+      height: 280px; 
+    }
+
+    #infoBox p {
+      margin: 8px 14px;     
+      line-height: 1.7em;
+      text-align: left;  
+      font-size: 1.1rem;
+    }
+
+    #infoBox h3 {
+      font-size: 1.2rem;
+      margin: 12px;
+    }
+  
+    #backBtn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      padding: 10px 15px;
+      background: #fd2929;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      z-index: 50;
+      display: none;
+    }
+
+    #backBtn:hover {
+      background: #04d662;
+    }
+
+    /*     ---      STATS     ---         */
+    .tables-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      align-items: start;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .confederacion-table {
+      border: 2px solid;
+      padding: 18px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .confederacion-table:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+
+    /* Colores por clase específica */
+    .confederacion-table.conmebol { border-color: #2ecc71; }
+    .confederacion-table.afc { border-color: #e74c3c; }
+    .confederacion-table.uefa { border-color: #3498db; }
+    .confederacion-table.caf { border-color: #f39c12; }
+    .confederacion-table.concacaf { border-color: #9b59b6; }
+    .confederacion-table.ofc { border-color: #1abc9c; }
+
+    .confederacion-table h3 {
+      margin: 0 0 15px 0;
+      font-size: 17px;
+      font-weight: bold;
+      padding: 10px 15px;
+      border-radius: 8px;
+      color: white;
+      text-align: center;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+
+    /* Colores de fondo para los títulos */
+    .confederacion-table.conmebol h3 {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+    }
+    .confederacion-table.afc h3 {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+    }
+    .confederacion-table.uefa h3 {
+      background: linear-gradient(135deg, #3498db, #2980b9);
+    }
+    .confederacion-table.caf h3 {
+      background: linear-gradient(135deg, #f39c12, #d35400);
+    }
+    .confederacion-table.concacaf h3 {
+      background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    }
+    .confederacion-table.ofc h3 {
+      background: linear-gradient(135deg, #1abc9c, #16a085);
+    }
+
+    .confederacion-table h3 small {
+      font-size: 12px;
+      opacity: 0.9;
+      font-weight: normal;
+    }
+
+    .confederacion-table table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .confederacion-table th {
+      background: rgba(0,0,0,0.05);
+      padding: 12px 8px;
+      text-align: left;
+      font-weight: 700;
+      color: #2c3e50;
+      border-bottom: 2px solid;
+      font-size: 13px;
+    }
+
+    /* Colores de borde para los headers */
+    .confederacion-table.conmebol th { border-bottom-color: #2ecc71; }
+    .confederacion-table.afc th { border-bottom-color: #e74c3c; }
+    .confederacion-table.uefa th { border-bottom-color: #3498db; }
+    .confederacion-table.caf th { border-bottom-color: #f39c12; }
+    .confederacion-table.concacaf th { border-bottom-color: #9b59b6; }
+    .confederacion-table.ofc th { border-bottom-color: #1abc9c; }
+
+    .confederacion-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #ecf0f1;
+      font-weight: 500;
+    }
+
+    .confederacion-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .confederacion-table tr:hover td {
+      background: rgba(0,0,0,0.03);
+    }
+
+    /* Efectos de número de mundiales */
+    .confederacion-table td:nth-child(2) {
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .confederacion-table td:nth-child(2):not(:empty):not([data-value="0"]) {
+      color: #e67e22;
+      background: rgba(230, 126, 34, 0.1);
+      border-radius: 4px;
+      padding: 4px 8px;
+      margin: 0 2px;
+    }
+
+    /*      ---    TRIVIA    ---       */
+    #triviaBox {
+      display: none;
+    }
+    
+    #triviaQuestion {
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+        color: #000000;
+        font-weight: 600;
+    }
+    
+    #triviaOptions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    #triviaOptions button {
+        padding: 15px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(145deg, #005baa, #004880);
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    #triviaOptions button:hover {
+        background: linear-gradient(145deg, #00bfff, #0099cc);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    #triviaResult {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 8px;
+    }
+    
+    .correct {
+        color: #13ad42;
+        background-color: #e8f7ef;
+    }
+    
+    .incorrect {
+        color: #fd2929;
+        background-color: #ffe8e8;
+    }
+
+    /*Interacciones html*/
+    .info-box {
+      display: none;
+      margin: 0 auto;
+      padding: 20px;
+      max-width: 800px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      text-align: center;
+      position: relative;
+      top: 0;
+    }
+
+    /*------VIDEO---------------*/
+    #videoBox video {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    #videoButtons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    #videoButtons button {
+        padding: 15px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(145deg, #005baa, #004880);
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    #videoButtons button:hover {
+        background: linear-gradient(145deg, #00bfff, #0099cc);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+
+  </style>
+
+<body>
+
+  <header>
+      <div id="intro" class="header-content"></div>
+  </header>
+
+  <div id="intro" class="container">
+    <section class="content-section">
+      <div class="text-content">
+        <h1 class="header-title">Mundial 2026</h1>
+        <p class="header-subtitle">Experiencia de Realidad Aumentada</p>
+        <p>La Copa Mundial de la FIFA 2026 será un gran evento, con partidos en tres países: Estados Unidos, Canadá y México. Por primera vez, 48 equipos competirán por el trofeo más preciado del fútbol mundial.</p>
+        <h1>¡Vive de otra forma del Mundial!</h1>
+        <p>Descubre estadísticas, datos curiosos y la emoción del fútbol con nuestra experiencia de Realidad Aumentada. Escanea las banderas de los países participantes y desbloquea contenido exclusivo de cada selección.</p>
+        <p>Con nuestra tecnología RA, podrás ver modelos 3D, videos destacados, unos filtros y resolver trivias interactivas sobre la historia de los mundiales.</p>
+      </div>
+      <div class="image-content">
+        <img src="assets/targets/img-originales/estadios.jpg" alt="Estadio de fútbol">
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <p class="cta-text">¡Prueba las experiencias del Mundial 2026!</p>
+      <div class="buttons-main">
+        <button class="cta-button" id="startBtn"><i class="fas fa-camera camera-icon"></i></button>
+        <button class="cta-button" id="mainBtn" onclick="showStats()">Estadísticas</button>
+        <button class="cta-button" id="mainBtn" onclick="showTrivia()">Trivia</button>
+        <button class="cta-button" id="mainBtn" onclick="showVideo()">Video</button>
+      </div>   
+    </section>
+  </div>
+
+  <div id="ar-container" class="ar-container"></div>
+
+  <div id="buttons-panel" class="buttons-panel">
+    <button id="btn4">Animar</button>
+  </div>
+
+  <button id="backBtn">Salir</button>
+
+  <div id="infoBox" class="info-box" style="display:none;"></div>
+
+  <!--Interacciones página-->
+
+  <div id="statsBox" class="info-box" style="display:none;"></div>
+  <br>
+  <br>
+
+  <div id="triviaBox" class="info-box">
+    <p id="triviaQuestion"></p>
+    <div id="triviaOptions"></div>
+    <p id="triviaResult"></p>
+  </div>
+  <br>
+  <br>
+
+  <div id="videoBox" class="info-box">
+    <video id="videoPlayer" controls></video>
+    <div id="videoButtons">
+      <button onclick="togglePlayPause()">Play/Pause</button>
+      <button onclick="applyFilter1()">Blanco/Negro</button>
+      <button onclick="applyFilter2()">Sepia</button>
+      <button onclick="applyFilter3()">Invertir</button>
+      <button onclick="closeVideo()">Cerrar</button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <h4>&copy; 2025 Mi Proyecto AR. Todos los derechos reservados.</h4>
+      <h4>Desarrollado por [Emiliano Romo Rmz]</h4>
+    </div>
+  </footer>
+
+
+  <script>
+    const startBtn = document.getElementById("startBtn");
+    const intro = document.getElementById("intro");
+    const arContainer = document.getElementById("ar-container");
+    const buttonsPanel = document.getElementById("buttons-panel");
+    const infoBox = document.getElementById("infoBox");
+
+    const statsBox = document.getElementById("statsBox");
+    const triviaBox = document.getElementById("triviaBox");
+    const triviaQuestion = document.getElementById("triviaQuestion");
+    const triviaResult = document.getElementById("triviaResult");
+    const videoBox = document.getElementById("videoBox");
+    const videoPlayer = document.getElementById("videoPlayer");
+    const videoButtons = document.getElementById("videoButtons");
+
+    const btn4 = document.getElementById("btn4");
+    const mainButtons = [btn4];
+
+    const countryData = {
+      argentina: {
+        info: `
+          <p>Mejor Jugador Actual: Lionel Messi
+          Otros Destacados: Julián Álvarez, Emiliano Martínez
+          Mejores Equipos: River Plate, Boca Juniors, Estudiantes</p>
+          `
+      },
+      mexico: {
+        info: `
+          <p>Mejor Participación: Cuartos de Final
+          <p>Mejor Jugador Actual: Edson Álvarez
+          <p>Otros Destacados: Santiago Giménez, Guillermo Ochoa</p>
+          <p>Mejores Equipos: América, Chivas, Monterrey</p>
+        `
+      },
+      usa: {
+        info: `
+          <p>Mejor Participación: Tercer Lugar</p>
+          <p>Mejor Jugador Actual: Christian Pulisic</p>
+          <p>Otros Destacados: Weston McKennie, Giovanni Reyna</p>
+          <p>Mejores Equipos: Columbus Crew, Inter Miami, LAFC</p>
+          `
+      },
+      brasil: {
+        info: `
+          <p>Mejor Jugador Actual: Vinicius Jr.</p>
+          <p>Otros Destacados: Rodrygo, Marquinhos</p>
+          <p>Mejores Equipos: Flamengo, Palmeiras, São Paulo</p>
+        `
+      },
+      canada: {
+        info: `
+          <p>Mejor Participación: Fase de Grupos (1986, 2022)</p>
+          <p>Mejor Jugador Actual: Alphonso Davies</p>
+          <p>Otros Destacados: Jonathan David, Tajon Buchanan</p>
+          <p>Mejores Equipos: Toronto FC, CF Montréal, Vancouver Whitecaps</p>
+        `
+      },
+      ecuador: {
+        info: `
+          <p>Mejor Participación: Octavos de Final (2006)</p>
+          <p>Mejor Jugador Actual: Moisés Caicedo</p>
+          <p>Otros Destacados: Piero Hincapié, Enner Valencia</p>
+          <p>Mejores Equipos: Barcelona SC, Emelec, Independiente del Valle</p>
+        `
+      },
+      uruguay: {
+        info: `
+          <p>Campeón Mundial: 1930, 1950</p>
+          <p>Mejor Jugador Actual: Federico Valverde</p>
+          <p>Otros Destacados: Ronald Araújo, Darwin Núñez, Rodrigo Bentancur</p>
+          <p>Mejores Equipos: Peñarol, Nacional</p>
+        `
+      },
+      colombia: {
+        info: `
+          <p>Mejor Participación: Cuartos de Final (2014)</p>
+          <p>Mejor Jugador Actual: Luis Díaz</p>
+          <p>Otros Destacados: James Rodríguez, Davinson Sánchez</p>
+          <p>Mejores Equipos: Atlético Nacional, Millonarios, América de Cali</p>
+        `
+      },
+      paraguay: {
+        info: `
+          <p>Mejor Participación: Cuartos de Final (2010)</p>
+          <p>Mejor Jugador Actual: Miguel Almirón</p>
+          <p>Otros Destacados: Julio Enciso, Antonio Sanabria</p>
+          <p>Mejores Equipos: Olimpia, Cerro Porteño, Libertad</p>
+        `
+      },
+      japon: {
+        info: `
+          <p>Mejor Participación: Octavos de Final (2002, 2010, 2018, 2022)</p>
+          <p>Mejor Jugador Actual: Takefusa Kubo</p>
+          <p>Otros Destacados: Kaoru Mitoma, Wataru Endo, Hiroki Ito</p>
+          <p>Mejores Equipos: Kawasaki Frontale, Urawa Reds, Yokohama F. Marinos</p>
+        `
+      },
+      iran: {
+        info: `
+          <p>Mejor Participación: Fase de Grupos (1978, 1998, 2006, 2014, 2018, 2022)</p>
+          <p>Mejor Jugador Actual: Mehdi Taremi</p>
+          <p>Otros Destacados: Sardar Azmoun, Alireza Jahanbakhsh</p>
+          <p>Mejores Equipos: Persépolis, Esteghlal, Sepahan</p>
+        `
+      },
+      jordan: {
+        info: `
+          <p>Mejor Participación: Nunca ha clasificado a un Mundial</p>
+          <p>Mejor Jugador Actual: Mousa Al-Taamari</p>
+          <p>Otros Destacados: Yazan Al-Naimat, Baha' Faisal</p>
+          <p>Mejores Equipos: Al-Faisaly, Al-Wehdat, Al-Jazeera</p>
+        `
+      },
+      coreasur: {
+        info: `
+          <p>Mejor Participación: Semifinales (2002)</p>
+          <p>Mejor Jugador Actual: Son Heung-min</p>
+          <p>Otros Destacados: Kim Min-jae, Lee Kang-in, Hwang Hee-chan</p>
+          <p>Mejores Equipos: Jeonbuk Hyundai, Ulsan Hyundai, FC Seoul</p>
+        `
+      },
+      uzbekistan: {
+        info: `
+          <p>Mejor Participación: Nunca ha clasificado a un Mundial</p>
+          <p>Mejor Jugador Actual: Eldor Shomurodov</p>
+          <p>Otros Destacados: Oston Urunov, Jaloliddin Masharipov</p>
+          <p>Mejores Equipos: Pakhtakor, Navbahor, Bunyodkor</p>
+        `
+      },
+      australia: {
+        info: `
+          <p>Mejor Participación: Octavos de Final (2006, 2022)</p>
+          <p>Mejor Jugador Actual: Harry Souttar</p>
+          <p>Otros Destacados: Mathew Ryan, Ajdin Hrustic</p>
+          <p>Mejores Equipos: Sydney FC, Melbourne Victory, Western Sydney Wanderers</p>
+        `
+      },
+      nuevazelan: {
+        info: `
+          <p>Mejor Participación: Fase de Grupos (1982, 2010)</p>
+          <p>Mejor Jugador Actual: Chris Wood</p>
+          <p>Otros Destacados: Liberato Cacace, Sarpreet Singh</p>
+          <p>Mejores Equipos: Auckland City, Wellington Phoenix, Team Wellington</p>
+        `
+      },
+      marruecos: {
+        info: `
+          <p>Mejor Participación: Semifinales (2022)</p>
+          <p>Mejor Jugador Actual: Achraf Hakimi</p>
+          <p>Otros Destacados: Hakim Ziyech, Yassine Bounou, Sofyan Amrabat</p>
+          <p>Mejores Equipos: Wydad Casablanca, Raja Casablanca, FAR Rabat</p>
+        `
+      },
+      tunez: {
+        info: `
+          <p>Mejor Participación: Fase de Grupos (1978, 1998, 2002, 2006, 2018, 2022)</p>
+          <p>Mejor Jugador Actual: Ellyes Skhiri</p>
+          <p>Otros Destacados: Wahbi Khazri, Aïssa Laïdouni</p>
+          <p>Mejores Equipos: Espérance de Tunis, Étoile du Sahel, Club Africain</p>
+        `
+      }
+      
+    };
+    
+    const worldCup2026 = [
+      // Anfitriones (clasificados automáticamente)
+      { pais: "USA", confederacion: "CONCACAF", mundiales: 0, puntos: 0, goles: 0 },
+      { pais: "Canadá", confederacion: "CONCACAF", mundiales: 0, puntos: 0, goles: 0 },
+      { pais: "México", confederacion: "CONCACAF", mundiales: 0, puntos: 0, goles: 0 },
+
+      // CONMEBOL
+      { pais: "Argentina", confederacion: "CONMEBOL", mundiales: 3, puntos: 38, GF: 31 },
+      { pais: "Ecuador", confederacion: "CONMEBOL", mundiales: 0, puntos: 29, GF: 14 },
+      { pais: "Colombia", confederacion: "CONMEBOL", mundiales: 0, puntos: 28, GF: 19 },
+      { pais: "Uruguay", confederacion: "CONMEBOL", mundiales: 2, puntos: 28, GF: 22 },
+      { pais: "Brasil", confederacion: "CONMEBOL", mundiales: 5, puntos: 28, GF: 24 },
+      { pais: "Paraguay", confederacion: "CONMEBOL", mundiales: 0, puntos: 28, GF: 13 },
+
+      // AFC (Asia) 
+      { pais: "Japón",  confederacion: "AFC", mundiales: 0, puntos: 23, GF: 30 }, 
+      { pais: "Iran",  confederacion: "AFC", mundiales: 0, puntos: 23, GF: 19 }, 
+      { pais: "Corea del Sur",  confederacion: "AFC", mundiales: 0, puntos: 22, GF: 20 },
+      { pais: "Uzbekistan",  confederacion: "AFC", mundiales: 0, puntos: 21, GF: 14 }, 
+      { pais: "Australia",  confederacion: "AFC", mundiales: 0, puntos: 19, GF: 16 }, 
+      { pais: "Jordania",  confederacion: "AFC", mundiales: 0, puntos: 16, GF: 16 }, 
+
+      // UEFA 
+
+      // CAF (África) 
+      { pais: "Marruecos", confederacion: "CAF", mundiales: 0, puntos: 21, GF: 21 }, 
+      { pais: "Túnez", confederacion: "CAF", mundiales: 0, puntos: 22, GF: 13 },
+
+      // CONCACAF 
+
+      // OFC 
+      { pais: "Nueva Zelanda", confederacion: "OFC", mundiales: 0, puntos: null, GF: null }
+    ];
+
+    const videos = [
+      "assets/videos/brasil.mp4",
+      "assets/videos/usa.mp4",
+      "assets/videos/mexico.mp4",
+      "assets/videos/argentina.mp4"
+    ];
+
+    const triviaData = [
+      { question: "¿En qué año Estados Unidos organizó por primera vez un Mundial?", 
+        options: ["1990", "1994", "1998"], answer: "1994" },
+      { question: "¿En qué ciudad se jugará la final del Mundial 2026 en Canadá?", 
+        options: ["Toronto", "Vancouver", "Montreal"], answer: "Vancouver" },
+      { question: "¿Cuántas veces México ha organizado un Mundial antes de 2026?", 
+        options: ["1", "2", "3"], answer: "2" },
+      { question: "¿Qué jugador argentino es el máximo goleador histórico de la selección?", 
+        options: ["Diego Maradona", "Lionel Messi", "Gabriel Batistuta"], answer: "Lionel Messi" },
+      { question: "¿En qué año ganó Uruguay su primer Mundial?", 
+        options: ["1930", "1950", "1962"], answer: "1930" },
+      { question: "¿Cuál es el país con más títulos mundiales de Sudamérica?", 
+        options: ["Argentina", "Brasil", "Uruguay"], answer: "Brasil" },
+      { question: "¿Cuál es el mejor resultado histórico de Colombia en un Mundial?", 
+        options: ["Cuartos de final 2014", "Octavos 1990", "Semifinal 2018"], answer: "Cuartos de final 2014" },
+      { question: "¿En qué año clasificó Ecuador por primera vez a un Mundial?", 
+        options: ["1998", "2002", "2006"], answer: "2002" },
+      { question: "¿Cuál es la máxima figura histórica de Paraguay en Mundiales?", 
+        options: ["Roque Santa Cruz", "José Luis Chilavert", "Salvador Cabañas"], answer: "José Luis Chilavert" },
+      { question: "¿Cuál fue la mejor participación de Japón en un Mundial?", 
+        options: ["Octavos de final", "Cuartos de final", "Fase de grupos"], answer: "Octavos de final" },
+      { question: "¿Cuántas veces ha clasificado Irán a un Mundial antes de 2026?", 
+        options: ["3", "5", "6"], answer: "6" },
+      { question: "¿En qué año clasificó Jordania por primera vez a un Mundial?", 
+        options: ["2022", "2026", "2018"], answer: "2026" },
+      { question: "¿Cuál fue la mejor actuación de Corea del Sur en un Mundial?", 
+        options: ["Cuartos de final 2002", "Semifinal 2002", "Octavos 2010"], answer: "Semifinal 2002" },
+      { question: "¿Cuál es el país de Asia Central que debutará en 2026?", 
+        options: ["Irán", "Uzbekistán", "Qatar"], answer: "Uzbekistán" },
+      { question: "¿En qué año Australia cambió de confederación y se unió a la AFC?", 
+        options: ["2006", "2010", "2014"], answer: "2006" },
+      { question: "¿Qué selección oceánica clasificó a 2026 junto a Australia?", 
+        options: ["Islas Salomón", "Nueva Zelanda", "Papúa Nueva Guinea"], answer: "Nueva Zelanda" },
+      { question: "¿En qué Mundial Marruecos alcanzó las semifinales?", 
+        options: ["2018", "2022", "2002"], answer: "2022" },
+      { question: "¿Cuántas veces ha clasificado Túnez a un Mundial antes de 2026?", 
+        options: ["4", "6", "8"], answer: "6" }
+
+    ];
+
+    function getRandomQuestions(data, num) {
+      let shuffled = [...data].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, num);
+    }
+
+    function crearTablaConfederacion(confederacion, titulo, cupos, colorClass) {
+      const equiposFiltrados = worldCup2026.filter(team => team.confederacion === confederacion);
+      
+      const tableRows = equiposFiltrados.map(team => `
+        <tr>
+          <td>${team.pais}</td>
+          <td>${team.mundiales}</td>
+          <td>${team.puntos || 'N/A'}</td>
+          <td>${team.GF || team.goles || 'N/A'}</td>
+        </tr>
+      `).join("");
+
+      return `
+        <div class="confederacion-table ${colorClass}">
+          <h3>${titulo} <small>(${cupos})</small></h3>
+          <table>
+            <tr>
+              <th>País</th>
+              <th>Mundiales Ganados</th>
+              <th>Puntos</th>
+              <th>Goles a Favor</th>
+            </tr>
+            ${tableRows}
+          </table>
+        </div>
+      `;
+    }
+
+    let triviaIndex = 0;
+    let triviaQuestions = getRandomQuestions(triviaData, 5);
+    let currentCountry = null;
+
+    //FUNCIONES
+
+    document.getElementById("backBtn").addEventListener("click", () => {
+      window.location.href = "index.html"; 
+    });
+        
+    function resetButtons() {
+      triviaActive = false;
+      triviaBox.style.display = "none";
+
+      mainButtons.forEach((btn, i) => {
+        btn.style.display = "inline-block";
+        btn.onclick = mainButtonsLogic[i];
+      });
+    }
+
+    //Datos 
+    function showInfo(country) {
+      if (!countryData[country]) return;
+      infoBox.style.display = "block";
+      triviaBox.style.display = "none";
+      infoBox.innerHTML = `<h3>Datos: </h3>${countryData[country].info}`;
+    }
+
+    // Estadísticas
+    function showStats() {
+      hideAll();
+      const statsBox = document.getElementById("statsBox");
+
+      statsBox.innerHTML = `
+        <div class="tables-grid">
+          <div class="column">
+            ${crearTablaConfederacion('CONMEBOL', 'Sudamérica', '6+1 cupos', 'conmebol')}
+            ${crearTablaConfederacion('AFC', 'Asia', '8+1 cupos', 'afc')}
+            ${crearTablaConfederacion('UEFA', 'Europa', '16 cupos', 'uefa')}
+          </div>
+          <div class="column">
+            ${crearTablaConfederacion('CAF', 'África', '9+1 cupos', 'caf')}
+            ${crearTablaConfederacion('CONCACAF', 'Norteamérica', '3+2 cupos', 'concacaf')}
+            ${crearTablaConfederacion('OFC', 'Oceanía', '1+1 cupos', 'ofc')}
+          </div>
+        </div>
+      `;
+
+      statsBox.style.display = "block";  
+    }
+
+    // Video
+    function showVideo() {
+      hideAll();
+      const videoBox = document.getElementById("videoBox");
+      const player = document.getElementById("videoPlayer");
+      const randomVideo = videos[Math.floor(Math.random() * videos.length)];
+      player.src = randomVideo;
+      player.play();
+      videoBox.style.display = "block";
+      videoPlayer.style.filter = "none";
+    }
+
+    function togglePlayPause() {
+      const player = document.getElementById("videoPlayer");
+      if (player.paused) {
+        player.play();
+      } else {
+        player.pause();
+      }
+    }
+
+    function applyFilter1() {
+      videoPlayer.style.filter = "grayscale(100%)";
+    }
+
+    function applyFilter2() {
+      videoPlayer.style.filter = "sepia(100%)";
+    }
+
+    function applyFilter3() {
+      videoPlayer.style.filter = "invert(100%)";
+    }
+
+    function closeVideo() {
+      const videoBox = document.getElementById("videoBox");
+      const player = document.getElementById("videoPlayer");
+      player.pause();
+      videoBox.style.display = "none";
+    }
+
+    // Animar modelo
+    document.getElementById('btn4').addEventListener('click', () => {
+      if (currentCountry) animaModel(currentCountry);
+    });
+
+    function animaModel(country) {
+      const model = document.getElementById(`entity-${country}`);
+      if (!model) return;
+
+      model.setAttribute("visible", true);
+
+      // Verificar si ya tiene animaciones en el glTF
+      const mesh = model.getObject3D("mesh");
+      if (mesh && mesh.animations && mesh.animations.length > 0) {
+        console.log("🎬 Animaciones detectadas:", mesh.animations.map(a => a.name));
+
+        // Iniciar animación solo al presionar
+        model.setAttribute("animation-mixer", {
+          clip: mesh.animations[0].name, // Usa la primera animación
+          loop: "repeat",
+          timeScale: 1
+        });
+
+      } else {
+        console.log("🔄 No tiene animaciones, aplicando giro");
+        // Si no tiene animaciones, le damos la animación de giro
+        model.setAttribute("animation", {
+          property: "rotation",
+          to: "0 360 0",
+          loop: true,
+          dur: 4000,
+          easing: "linear"
+        });
+      }
+    }
+
+    // Trivia
+    function showTrivia() {
+      hideAll();
+      triviaIndex = 0; // empezamos desde la primera
+      loadTriviaQuestion();
+      document.getElementById("triviaBox").style.display = "block";
+    }
+
+    function loadTriviaQuestion() {
+      if (triviaIndex >= triviaQuestions.length) {
+        document.getElementById("triviaBox").style.display = "none";
+        return;
+      }
+
+      const questionData = triviaQuestions[triviaIndex];
+      document.getElementById("triviaQuestion").textContent = questionData.question;
+
+      const optionsDiv = document.getElementById("triviaOptions");
+      optionsDiv.innerHTML = "";
+      document.getElementById("triviaResult").textContent = "";
+
+      questionData.options.forEach(option => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.onclick = () => checkAnswer(option, questionData.answer);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    // --- Función para verificar la respuesta ---
+    function checkAnswer(selected, correct) {
+      if (selected === correct) {
+        document.getElementById("triviaResult").textContent = "✅ ¡Correcto!";
+      } else {
+        document.getElementById("triviaResult").textContent = "❌ Incorrecto. La respuesta era: " + correct;
+      }
+
+      triviaIndex++;
+      setTimeout(loadTriviaQuestion, 1000); // pasar a la siguiente después de 1s
+    }
+
+    function hideAll() {
+      document.getElementById("statsBox").style.display = "none";
+      document.getElementById("videoBox").style.display = "none";
+      document.getElementById("triviaBox").style.display = "none";
+
+      videoPlayer.pause();
+      videoPlayer.currentTime = 0;
+    }
+
+     const mainButtonsLogic = [
+      () => { if (currentCountry) showStats(currentCountry); },
+      () => { if (currentCountry) showVideo(currentCountry); },
+      () => { if (currentCountry) startTrivia(currentCountry); },
+      () => { if (currentCountry) animaModel(currentCountry); }
+    ];
+  
+
+    function initARLogic() {
+      const targets = document.querySelectorAll("[mindar-image-target]");
+      document.getElementById("backBtn").style.display = "block";
+
+      targets.forEach(target => {
+        const country = target.dataset.country;
+        const model = document.getElementById(`entity-${country}`);
+
+        target.addEventListener("targetFound", () => {
+          console.log("🎯 Detectado:", country);
+          currentCountry = country;
+
+          model.setAttribute("visible", "true");
+          showInfo(country);
+          buttonsPanel.style.display = "flex";
+          resetButtons();
+
+        });
+
+        target.addEventListener("targetLost", () => {
+          console.log("❌ Perdido:", country);
+          currentCountry = null;
+
+          model.setAttribute("visible", "false");
+          buttonsPanel.style.display = "none";
+          infoBox.style.display = "none";
+        });
+      });
+    }
+
+    startBtn.addEventListener("click", () => {
+      intro.style.display = "none";
+      arContainer.classList.add("active");
+
+      arContainer.innerHTML = `
+        <a-scene mindar-image="imageTargetSrc: assets/targets/targets.mind; autoStart: true;" 
+                color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights"
+                vr-mode-ui="enabled: false"
+                device-orientation-permission-ui="enabled: false">
+          
+          <a-assets>
+            <!--MODELOS-->
+            <a-asset-item id="model-brasil" src="assets/modelos/brasilao/cristeredenter.glb"></a-asset-item>
+            <a-asset-item id="model-argentina" src="assets/modelos/mate/scene.gltf"></a-asset-item>
+            <a-asset-item id="model-mexico" src="assets/modelos/mexico/scene.glb"></a-asset-item>
+            <a-asset-item id="model-usa" src="assets/modelos/eagle/scene.gltf"></a-asset-item>
+            <a-asset-item id="model-canada" src="assets/modelos/moose/scene.gltf"></a-asset-item>
+            <a-asset-item id="model-coreasur" src="assets/modelos/coreaS/coreaS.gltf"></a-asset-item>
+            <a-asset-item id="model-nuevazelan" src="assets/modelos/NZ/NZ.gltf"></a-asset-item>
+            <a-asset-item id="model-australia" src="assets/modelos/austria/scene.gltf"></a-asset-item>
+            <a-asset-item id="model-jordan" src="assets/modelos/petra/scene.gltf"></a-asset-item>
+            <a-asset-item id="model-ecuador" src="assets/modelos/flag/scene.gltf"></a-asset-item>
+            <a-asset-item id="model-iran" src="assets/modelos/iran/scene.gltf"></a-asset-item>
+            <a-asset-item id="model-uzbekistan" src="assets/modelos/uzbe/scene.gltf"></a-asset-item>
+            <a-asset-item id="model-japon" src="assets/modelos/suchi/scene.gltf"></a-asset-item>
+            <a-asset-item id="model-colombia" src="assets/modelos/colombia/scene.gltf"></a-asset-item>
+            <a-asset-item id="model-tunez" src="assets/modelos/tunez/scene.gltf"></a-asset-item>
+            <a-asset-item id="model-marruecos" src="assets/modelos/morocco/flag.glb"></a-asset-item>                           
+
+          </a-assets>
+
+          <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+          <!-- Targets -->
+          <a-entity mindar-image-target="targetIndex: 0" data-country="mexico">
+            <a-gltf-model id="entity-mexico" src="#model-mexico" scale="0.3 0.3 0.3" position="0 0.3 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 1" data-country="mexico">
+            <a-gltf-model id="entity-mexico" src="#model-mexico" scale="0.3 0.3 0.3" position="0 0.3 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 2" data-country="mexico">
+            <a-gltf-model id="entity-mexico" src="#model-mexico" scale="0.3 0.3 0.3" position="0 0.3 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 3" data-country="usa">
+            <a-gltf-model id="entity-usa" src="#model-usa" scale="0.3 0.3 0.3" position="0 0.5 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 4" data-country="usa">
+            <a-gltf-model id="entity-usa" src="#model-usa" scale="0.3 0.3 0.3" position="0 0.5 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 5" data-country="australia">
+            <a-gltf-model id="entity-australia" src="#model-australia" scale="0.15 0.15 0.15" position="0 0.5 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 6" data-country="australia">
+            <a-gltf-model id="entity-australia" src="#model-australia" scale="0.15 0.15 0.15" position="0 0.5 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 7" data-country="brasil">
+           <a-gltf-model id="entity-brasil" src="#model-brasil" scale="0.015 0.015 0.015" position="0 0.3 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 8" data-country="brasil">
+           <a-gltf-model id="entity-brasil" src="#model-brasil" scale="0.015 0.015 0.015" position="0 0.3 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 9" data-country="iran">
+            <a-gltf-model id="entity-iran" src="#model-iran" scale="0.08 0.08 0.08" position="0 0.46 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 10" data-country="iran">
+            <a-gltf-model id="entity-iran" src="#model-iran" scale="0.08 0.08 0.08" position="0 0.46 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 11" data-country="japon">
+            <a-gltf-model id="entity-japon" src="#model-japon" scale="0.03 0.03 0.03" position="0 0.3 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+           <a-entity mindar-image-target="targetIndex: 12" data-country="japon">
+            <a-gltf-model id="entity-japon" src="#model-japon" scale="0.03 0.03 0.03" position="0 0.3 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 13" data-country="argentina">
+            <a-gltf-model id="entity-argentina" src="#model-argentina" scale="8.0 8.0 8.0" position="0 0.3 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 14" data-country="argentina">
+            <a-gltf-model id="entity-argentina" src="#model-argentina" scale="8.0 8.0 8.0" position="0 0.3 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 15" data-country="canada">
+            <a-gltf-model id="entity-canada" src="#model-canada" scale="0.5 0.5 0.5" position="0 0.5 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 16" data-country="canada">
+            <a-gltf-model id="entity-canada" src="#model-canada" scale="0.5 0.5 0.5" position="0 0.5 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+          
+          <a-entity mindar-image-target="targetIndex: 17" data-country="uzbekistan">
+            <a-gltf-model id="entity-uzbekistan" src="#model-uzbekistan" scale="0.02 0.02 0.02" position="0 0.5 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 18" data-country="uzbekistan">
+            <a-gltf-model id="entity-uzbekistan" src="#model-uzbekistan" scale="0.02 0.02 0.02" position="0 0.5 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 19" data-country="jordan">
+            <a-gltf-model id="entity-jordan" src="#model-jordan" scale="0.18 0.18 0.18" position="0 0.4 0" 
+             visible="false"></a-gltf-model>
+          </a-entity>
+
+           <a-entity mindar-image-target="targetIndex: 20" data-country="jordan">
+            <a-gltf-model id="entity-jordan" src="#model-jordan" scale="0.18 0.18 0.18" position="0 0.4 0" 
+             visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 21" data-country="nuevazelan">
+            <a-gltf-model id="entity-nuevazelan" src="#model-nuevazelan" scale="0.15 0.15 0.15" position="0 0.35 0" 
+             visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 22" data-country="nuevazelan">
+            <a-gltf-model id="entity-nuevazelan" src="#model-nuevazelan" scale="0.15 0.15 0.15" position="0 0.35 0" 
+             visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 23" data-country="ecuador">
+            <a-gltf-model id="entity-ecuador" src="#model-ecuador" scale="0.15 0.15 0.15" position="0 0.38 0" 
+             visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 24" data-country="ecuador">
+            <a-gltf-model id="entity-ecuador" src="#model-ecuador" scale="0.15 0.15 0.15" position="0 0.38 0" 
+             visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 25" data-country="coreasur">
+            <a-gltf-model id="entity-coreasur" src="#model-coreasur" scale="0.17 0.17 0.17" position="0 0.3 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 26" data-country="coreasur">
+            <a-gltf-model id="entity-coreasur" src="#model-coreasur" scale="0.17 0.17 0.17" position="0 0.3 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 27" data-country="colombia">
+            <a-gltf-model id="entity-colombia" src="#model-colombia" scale="0.15 0.15 0.15" position="0 0.38 0" 
+             visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 28" data-country="colombia">
+            <a-gltf-model id="entity-colombia" src="#model-colombia" scale="0.15 0.15 0.15" position="0 0.38 0" 
+             visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 29" data-country="uruguay">
+            <a-gltf-model id="entity-coreasur" src="#model-coreasur" scale="0.17 0.17 0.17" position="0 0.3 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 30" data-country="uruguay">
+            <a-gltf-model id="entity-coreasur" src="#model-coreasur" scale="0.17 0.17 0.17" position="0 0.3 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 31" data-country="paraguay">
+            <a-gltf-model id="entity-ecuador" src="#model-ecuador" scale="0.15 0.15 0.15" position="0 0.38 0" 
+             visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 32" data-country="paraguay">
+            <a-gltf-model id="entity-ecuador" src="#model-ecuador" scale="0.15 0.15 0.15" position="0 0.38 0" 
+             visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 33" data-country="marruecos">
+            <a-gltf-model id="entity-marruecos" src="#model-marruecos" scale="0.15 0.15 0.15" position="0 0.3 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 34" data-country="marruecos">
+            <a-gltf-model id="entity-marruecos" src="#model-marruecos" scale="0.12 0.12 0.12" position="0 0.3 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 35" data-country="tunez">
+            <a-gltf-model id="entity-tunez" src="#model-tunez" scale="0.17 0.17 0.17" position="0 0 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+          <a-entity mindar-image-target="targetIndex: 36" data-country="tunez">
+            <a-gltf-model id="entity-tunez" src="#model-tunez" scale="0.17 0.17 0.17" position="0 0 0" 
+              visible="false"></a-gltf-model>
+          </a-entity>
+
+        </a-scene>
+      `;
+
+      setTimeout(() => {
+        window.dispatchEvent(new Event("resize"));
+      }, 300);
+
+      initARLogic();
+      resetButtons();
+
+    });
+
+  </script>
+
+</html>
+
+
+

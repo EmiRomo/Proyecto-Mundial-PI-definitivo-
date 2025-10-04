@@ -1,0 +1,21 @@
+  "United States"    
+  "Canada"     
+  "Mexico"            
+
+
+  "Argentina" ---- "Uruguay" 
+  "Brazil" ------ "Colombia"  
+  "Ecuador" ----- "Paraguay"
+
+  "Japan"
+  "Iran" 
+  "Jordan"  
+  "South Korea"  
+  "Uzbekistan"  
+  "Australia"  
+
+  "New Zealand" 
+
+  
+                 ------ "Marruecos"  
+                  ------"Tunéz"
