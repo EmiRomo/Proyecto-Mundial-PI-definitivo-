@@ -492,6 +492,64 @@
         transform: translateY(-2px);
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     }
+
+
+    @media (max-width: 768px) {
+    /* Ya tienes esta regla para el footer, las nuevas van debajo */
+    footer {
+      font-size: 0.8rem;
+      padding: 15px 5px;
+    }
+
+    /* 1. Hacemos que el contenido principal se apile verticalmente */
+    .content-section {
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* 2. Reducimos el tamaño de los títulos para que quepan */
+    .header-title {
+      font-size: 1.8rem; 
+    }
+    .header-subtitle {
+      font-size: 1.1rem;
+    }
+    h1 {
+      font-size: 1.1rem;
+    }
+
+    /* 3. Ajustamos los botones principales para que no ocupen tanto espacio */
+    .buttons-main {
+      flex-direction: column;
+      align-items: center;
+    }
+    .cta-button {
+      margin: 10px;
+      width: 80%;
+      max-width: 200px;
+    }
+
+    /* 4. Hacemos que las tablas de estadísticas se pongan una debajo de la otra */
+    .tables-grid {
+      grid-template-columns: 1fr; /* Cambiamos de 2 columnas a 1 */
+    }
+
+    /* 5. Hacemos que la ventana de información de AR sea flexible */
+    #infoBox {
+      width: 90%; 
+      max-width: 370px;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 20%;
+      height: auto; /* La altura se ajusta al contenido */
+      padding-bottom: 20px;
+    }
+    
+    #infoBox p {
+      font-size: 0.9rem;
+      line-height: 1.5em;
+    }
+  }
   </style>
 
 <body>
