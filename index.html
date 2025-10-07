@@ -6,7 +6,6 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
   </head>
   <style>
     body, html {
@@ -166,11 +165,11 @@
     .footer-content {
       display: flex;
       justify-content: center;  
-      align-items: center;     
-      gap: 20px;               
+      align-items: center;      
+      gap: 20px;              
       flex-wrap: wrap;
       background-color: #000000; 
-      color: #ddd;       
+      color: #ddd;     
       margin-top: 40px;
       font-size: 0.85rem;  
     }
@@ -239,7 +238,7 @@
     }
 
     #infoBox p {
-      margin: 8px 14px;     
+      margin: 8px 14px;      
       line-height: 1.7em;
       text-align: left;  
       font-size: 1.1rem;
@@ -268,7 +267,7 @@
       background: #04d662;
     }
 
-    /*     ---      STATS     ---         */
+    /* ---     STATS    ---        */
     .tables-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -393,7 +392,7 @@
       margin: 0 2px;
     }
 
-    /*      ---    TRIVIA    ---       */
+    /* ---    TRIVIA    ---       */
     #triviaBox {
       display: none;
     }
@@ -493,14 +492,11 @@
         transform: translateY(-2px);
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     }
-
-
   </style>
 
 <body>
-
   <header>
-      <div id="intro" class="header-content"></div>
+    <div class="header-content"></div>
   </header>
 
   <div id="intro" class="container">
@@ -522,29 +518,23 @@
       <p class="cta-text">¡Prueba las experiencias del Mundial 2026!</p>
       <div class="buttons-main">
         <button class="cta-button" id="startBtn"><i class="fas fa-camera camera-icon"></i></button>
-        <button class="cta-button" id="mainBtn" onclick="showStats()">Estadísticas</button>
-        <button class="cta-button" id="mainBtn" onclick="showTrivia()">Trivia</button>
-        <button class="cta-button" id="mainBtn" onclick="showVideo()">Video</button>
+        <button class="cta-button" onclick="showStats()">Estadísticas</button>
+        <button class="cta-button" onclick="showTrivia()">Trivia</button>
+        <button class="cta-button" onclick="showVideo()">Video</button>
       </div>   
     </section>
   </div>
 
   <div id="ar-container" class="ar-container"></div>
-
   <div id="buttons-panel" class="buttons-panel">
     <button id="btn4">Animar</button>
   </div>
-
   <button id="backBtn">Salir</button>
-
   <div id="infoBox" class="info-box" style="display:none;"></div>
-
-  <!--Interacciones página-->
 
   <div id="statsBox" class="info-box" style="display:none;"></div>
   <br>
   <br>
-
   <div id="triviaBox" class="info-box">
     <p id="triviaQuestion"></p>
     <div id="triviaOptions"></div>
@@ -552,7 +542,6 @@
   </div>
   <br>
   <br>
-
   <div id="videoBox" class="info-box">
     <video id="videoPlayer" controls></video>
     <div id="videoButtons">
@@ -571,14 +560,12 @@
     </div>
   </footer>
 
-
   <script>
     const startBtn = document.getElementById("startBtn");
     const intro = document.getElementById("intro");
     const arContainer = document.getElementById("ar-container");
     const buttonsPanel = document.getElementById("buttons-panel");
     const infoBox = document.getElementById("infoBox");
-
     const statsBox = document.getElementById("statsBox");
     const triviaBox = document.getElementById("triviaBox");
     const triviaQuestion = document.getElementById("triviaQuestion");
@@ -586,7 +573,6 @@
     const videoBox = document.getElementById("videoBox");
     const videoPlayer = document.getElementById("videoPlayer");
     const videoButtons = document.getElementById("videoButtons");
-
     const btn4 = document.getElementById("btn4");
     const mainButtons = [btn4];
 
@@ -816,248 +802,53 @@
         options: ["4", "6", "8"], answer: "6" }
 
     ];
-
-    function getRandomQuestions(data, num) {
-      let shuffled = [...data].sort(() => 0.5 - Math.random());
-      return shuffled.slice(0, num);
-    }
-
-    function crearTablaConfederacion(confederacion, titulo, cupos, colorClass) {
-      const equiposFiltrados = worldCup2026.filter(team => team.confederacion === confederacion);
-      
-      const tableRows = equiposFiltrados.map(team => `
-        <tr>
-          <td>${team.pais}</td>
-          <td>${team.mundiales}</td>
-          <td>${team.puntos || 'N/A'}</td>
-          <td>${team.GF || team.goles || 'N/A'}</td>
-        </tr>
-      `).join("");
-
-      return `
-        <div class="confederacion-table ${colorClass}">
-          <h3>${titulo} <small>(${cupos})</small></h3>
-          <table>
-            <tr>
-              <th>País</th>
-              <th>Mundiales Ganados</th>
-              <th>Puntos</th>
-              <th>Goles a Favor</th>
-            </tr>
-            ${tableRows}
-          </table>
-        </div>
-      `;
-    }
-
-    let triviaIndex = 0;
-    let triviaQuestions = getRandomQuestions(triviaData, 5);
     let currentCountry = null;
 
-    //FUNCIONES
-
-    document.getElementById("backBtn").addEventListener("click", () => {
-      window.location.href = "index.html"; 
-    });
-        
-    function resetButtons() {
-      triviaActive = false;
-      triviaBox.style.display = "none";
-
-      mainButtons.forEach((btn, i) => {
-        btn.style.display = "inline-block";
-        btn.onclick = mainButtonsLogic[i];
-      });
-    }
-
-    //Datos 
-    function showInfo(country) {
-      if (!countryData[country]) return;
-      infoBox.style.display = "block";
-      triviaBox.style.display = "none";
-      infoBox.innerHTML = `<h3>Datos: </h3>${countryData[country].info}`;
-    }
-
-    // Estadísticas
-    function showStats() {
-      hideAll();
-      const statsBox = document.getElementById("statsBox");
-
-      statsBox.innerHTML = `
-        <div class="tables-grid">
-          <div class="column">
-            ${crearTablaConfederacion('CONMEBOL', 'Sudamérica', '6+1 cupos', 'conmebol')}
-            ${crearTablaConfederacion('AFC', 'Asia', '8+1 cupos', 'afc')}
-            ${crearTablaConfederacion('UEFA', 'Europa', '16 cupos', 'uefa')}
-          </div>
-          <div class="column">
-            ${crearTablaConfederacion('CAF', 'África', '9+1 cupos', 'caf')}
-            ${crearTablaConfederacion('CONCACAF', 'Norteamérica', '3+2 cupos', 'concacaf')}
-            ${crearTablaConfederacion('OFC', 'Oceanía', '1+1 cupos', 'ofc')}
-          </div>
-        </div>
-      `;
-
-      statsBox.style.display = "block";  
-    }
-
-    // Video
-    function showVideo() {
-      hideAll();
-      const videoBox = document.getElementById("videoBox");
-      const player = document.getElementById("videoPlayer");
-      const randomVideo = videos[Math.floor(Math.random() * videos.length)];
-      player.src = randomVideo;
-      player.play();
-      videoBox.style.display = "block";
-      videoPlayer.style.filter = "none";
-    }
-
-    function togglePlayPause() {
-      const player = document.getElementById("videoPlayer");
-      if (player.paused) {
-        player.play();
-      } else {
-        player.pause();
-      }
-    }
-
-    function applyFilter1() {
-      videoPlayer.style.filter = "grayscale(100%)";
-    }
-
-    function applyFilter2() {
-      videoPlayer.style.filter = "sepia(100%)";
-    }
-
-    function applyFilter3() {
-      videoPlayer.style.filter = "invert(100%)";
-    }
-
-    function closeVideo() {
-      const videoBox = document.getElementById("videoBox");
-      const player = document.getElementById("videoPlayer");
-      player.pause();
-      videoBox.style.display = "none";
-    }
-
-    // Animar modelo
-    document.getElementById('btn4').addEventListener('click', () => {
-      if (currentCountry) animaModel(currentCountry);
-    });
-
-    function animaModel(country) {
-      const model = document.getElementById(`entity-${country}`);
-      if (!model) return;
-
-      model.setAttribute("visible", true);
-
-      // Verificar si ya tiene animaciones en el glTF
-      const mesh = model.getObject3D("mesh");
-      if (mesh && mesh.animations && mesh.animations.length > 0) {
-        console.log("🎬 Animaciones detectadas:", mesh.animations.map(a => a.name));
-
-        // Iniciar animación solo al presionar
-        model.setAttribute("animation-mixer", {
-          clip: mesh.animations[0].name, // Usa la primera animación
-          loop: "repeat",
-          timeScale: 1
-        });
-
-      } else {
-        console.log("🔄 No tiene animaciones, aplicando giro");
-        // Si no tiene animaciones, le damos la animación de giro
-        model.setAttribute("animation", {
-          property: "rotation",
-          to: "0 360 0",
-          loop: true,
-          dur: 4000,
-          easing: "linear"
-        });
-      }
-    }
-
-    // Trivia
-    function showTrivia() {
-      hideAll();
-      triviaIndex = 0; // empezamos desde la primera
-      loadTriviaQuestion();
-      document.getElementById("triviaBox").style.display = "block";
-    }
-
-    function loadTriviaQuestion() {
-      if (triviaIndex >= triviaQuestions.length) {
-        document.getElementById("triviaBox").style.display = "none";
-        return;
-      }
-
-      const questionData = triviaQuestions[triviaIndex];
-      document.getElementById("triviaQuestion").textContent = questionData.question;
-
-      const optionsDiv = document.getElementById("triviaOptions");
-      optionsDiv.innerHTML = "";
-      document.getElementById("triviaResult").textContent = "";
-
-      questionData.options.forEach(option => {
-        const btn = document.createElement("button");
-        btn.textContent = option;
-        btn.onclick = () => checkAnswer(option, questionData.answer);
-        optionsDiv.appendChild(btn);
-      });
-    }
-
-    // --- Función para verificar la respuesta ---
-    function checkAnswer(selected, correct) {
-      if (selected === correct) {
-        document.getElementById("triviaResult").textContent = "✅ ¡Correcto!";
-      } else {
-        document.getElementById("triviaResult").textContent = "❌ Incorrecto. La respuesta era: " + correct;
-      }
-
-      triviaIndex++;
-      setTimeout(loadTriviaQuestion, 1000); // pasar a la siguiente después de 1s
-    }
-
-    function hideAll() {
-      document.getElementById("statsBox").style.display = "none";
-      document.getElementById("videoBox").style.display = "none";
-      document.getElementById("triviaBox").style.display = "none";
-
-      videoPlayer.pause();
-      videoPlayer.currentTime = 0;
-    }
-
-     const mainButtonsLogic = [
-      () => { if (currentCountry) showStats(currentCountry); },
-      () => { if (currentCountry) showVideo(currentCountry); },
-      () => { if (currentCountry) startTrivia(currentCountry); },
-      () => { if (currentCountry) animaModel(currentCountry); }
-    ];
-  
+    document.getElementById("backBtn").addEventListener("click", () => { window.location.href = "index.html"; });
+    function resetButtons() { mainButtons.forEach((btn, i) => { btn.style.display = "inline-block"; }); }
+    function showInfo(country) { if (!countryData[country]) return; infoBox.style.display = "block"; triviaBox.style.display = "none"; infoBox.innerHTML = `<h3>Datos: </h3>${countryData[country].info}`; }
+    function showStats() { hideAll(); const statsBox = document.getElementById("statsBox"); statsBox.innerHTML = `<div class="tables-grid"><div class="column">${crearTablaConfederacion('CONMEBOL', 'Sudamérica', '6+1 cupos', 'conmebol')}${crearTablaConfederacion('AFC', 'Asia', '8+1 cupos', 'afc')}${crearTablaConfederacion('UEFA', 'Europa', '16 cupos', 'uefa')}</div><div class="column">${crearTablaConfederacion('CAF', 'África', '9+1 cupos', 'caf')}${crearTablaConfederacion('CONCACAF', 'Norteamérica', '3+2 cupos', 'concacaf')}${crearTablaConfederacion('OFC', 'Oceanía', '1+1 cupos', 'ofc')}</div></div>`; statsBox.style.display = "block"; }
+    function crearTablaConfederacion(confederacion, titulo, cupos, colorClass) { const equiposFiltrados = worldCup2026.filter(team => team.confederacion === confederacion); const tableRows = equiposFiltrados.map(team => `<tr><td>${team.pais}</td><td>${team.mundiales}</td><td>${team.puntos || 'N/A'}</td><td>${team.GF || team.goles || 'N/A'}</td></tr>`).join(""); return `<div class="confederacion-table ${colorClass}"><h3>${titulo} <small>(${cupos})</small></h3><table><tr><th>País</th><th>Mundiales Ganados</th><th>Puntos</th><th>Goles a Favor</th></tr>${tableRows}</table></div>`; }
+    function showVideo() { hideAll(); const videoBox = document.getElementById("videoBox"); const player = document.getElementById("videoPlayer"); const randomVideo = videos[Math.floor(Math.random() * videos.length)]; player.src = randomVideo; player.play(); videoBox.style.display = "block"; videoPlayer.style.filter = "none"; }
+    function togglePlayPause() { videoPlayer.paused ? videoPlayer.play() : videoPlayer.pause(); }
+    function applyFilter1() { videoPlayer.style.filter = "grayscale(100%)"; }
+    function applyFilter2() { videoPlayer.style.filter = "sepia(100%)"; }
+    function applyFilter3() { videoPlayer.style.filter = "invert(100%)"; }
+    function closeVideo() { videoBox.style.display = "none"; videoPlayer.pause(); }
+    document.getElementById('btn4').addEventListener('click', () => { if (currentCountry) animaModel(currentCountry); });
+    function animaModel(country) { const model = document.querySelector(`[data-country="${country}"] > a-gltf-model`); if (!model) return; model.setAttribute("visible", true); const mesh = model.getObject3D("mesh"); if (mesh && mesh.animations && mesh.animations.length > 0) { model.setAttribute("animation-mixer", { clip: mesh.animations[0].name, loop: "repeat", timeScale: 1 }); } else { model.setAttribute("animation", { property: "rotation", to: "0 360 0", loop: true, dur: 4000, easing: "linear" }); } }
+    let triviaIndex = 0; let triviaQuestions = [];
+    function showTrivia() { hideAll(); triviaIndex = 0; triviaQuestions = [...triviaData].sort(() => 0.5 - Math.random()).slice(0, 5); loadTriviaQuestion(); triviaBox.style.display = "block"; }
+    function loadTriviaQuestion() { if (triviaIndex >= triviaQuestions.length) { triviaBox.style.display = "none"; return; } const questionData = triviaQuestions[triviaIndex]; triviaQuestion.textContent = questionData.question; const optionsDiv = document.getElementById("triviaOptions"); optionsDiv.innerHTML = ""; triviaResult.textContent = ""; questionData.options.forEach(option => { const btn = document.createElement("button"); btn.textContent = option; btn.onclick = () => checkAnswer(option, questionData.answer); optionsDiv.appendChild(btn); }); }
+    function checkAnswer(selected, correct) { triviaResult.textContent = selected === correct ? "✅ ¡Correcto!" : `❌ Incorrecto. La respuesta era: ${correct}`; triviaIndex++; setTimeout(loadTriviaQuestion, 1500); }
+    function hideAll() { statsBox.style.display = "none"; videoBox.style.display = "none"; triviaBox.style.display = "none"; videoPlayer.pause(); videoPlayer.currentTime = 0; }
+    
 
     function initARLogic() {
       const targets = document.querySelectorAll("[mindar-image-target]");
       document.getElementById("backBtn").style.display = "block";
 
       targets.forEach(target => {
-        const country = target.dataset.country;
-        const model = document.getElementById(`entity-${country}`);
+        target.addEventListener("targetFound", event => {
+          const country = event.target.dataset.country;
+          const model = event.target.querySelector("a-gltf-model"); // <-- ¡CAMBIO IMPORTANTE!
 
-        target.addEventListener("targetFound", () => {
           console.log("🎯 Detectado:", country);
           currentCountry = country;
-
+          
           model.setAttribute("visible", "true");
           showInfo(country);
           buttonsPanel.style.display = "flex";
           resetButtons();
-
         });
 
-        target.addEventListener("targetLost", () => {
+        target.addEventListener("targetLost", event => {
+          const country = event.target.dataset.country;
+          const model = event.target.querySelector("a-gltf-model"); // <-- ¡CAMBIO IMPORTANTE!
+
           console.log("❌ Perdido:", country);
           currentCountry = null;
-
+          
           model.setAttribute("visible", "false");
           buttonsPanel.style.display = "none";
           infoBox.style.display = "none";
@@ -1066,17 +857,18 @@
     }
 
     startBtn.addEventListener("click", () => {
-      intro.style.display = "none";
+      document.getElementById("intro").style.display = "none";
+      document.querySelector("header").style.display = "none";
+      document.querySelector("footer").style.display = "none";
       arContainer.classList.add("active");
 
       arContainer.innerHTML = `
         <a-scene mindar-image="imageTargetSrc: assets/targets/targets.mind; autoStart: true;" 
-                color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights"
-                vr-mode-ui="enabled: false"
-                device-orientation-permission-ui="enabled: false">
+                 color-space="sRGB" 
+                 renderer="colorManagement: true" vr-mode-ui="enabled: false"
+                 device-orientation-permission-ui="enabled: false">
           
-          <a-assets>
-            <!--MODELOS-->
+          <a-assets timeout="10000">
             <a-asset-item id="model-brasil" src="assets/modelos/brasilao/cristeredenter.glb"></a-asset-item>
             <a-asset-item id="model-argentina" src="assets/modelos/mate/scene.gltf"></a-asset-item>
             <a-asset-item id="model-mexico" src="assets/modelos/mexico/scene.glb"></a-asset-item>
@@ -1095,198 +887,104 @@
             <a-asset-item id="model-marruecos" src="assets/modelos/morocco/flag.glb"></a-asset-item> 
             <a-asset-item id="model-paraguay" src="assets/modelos/para/flag.gltf"></a-asset-item>
             <a-asset-item id="model-uruguay" src="assets/modelos/Uru/flag.gltf"></a-asset-item>  
-
           </a-assets>
 
           <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-          <!-- Targets -->
           <a-entity mindar-image-target="targetIndex: 0" data-country="mexico">
-            <a-gltf-model id="entity-mexico" src="#model-mexico" scale="0.3 0.3 0.3" position="0 0.3 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-mexico" scale="0.3 0.3 0.3" position="0 0.3 0" visible="false"></a-gltf-model></a-entity>
           <a-entity mindar-image-target="targetIndex: 1" data-country="mexico">
-            <a-gltf-model id="entity-mexico" src="#model-mexico" scale="0.3 0.3 0.3" position="0 0.3 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-mexico" scale="0.3 0.3 0.3" position="0 0.3 0" visible="false"></a-gltf-model></a-entity>
           <a-entity mindar-image-target="targetIndex: 2" data-country="mexico">
-            <a-gltf-model id="entity-mexico" src="#model-mexico" scale="0.3 0.3 0.3" position="0 0.3 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-mexico" scale="0.3 0.3 0.3" position="0 0.3 0" visible="false"></a-gltf-model></a-entity>
+          
           <a-entity mindar-image-target="targetIndex: 3" data-country="usa">
-            <a-gltf-model id="entity-usa" src="#model-usa" scale="0.3 0.3 0.3" position="0 0.5 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-usa" scale="0.3 0.3 0.3" position="0 0.5 0" visible="false"></a-gltf-model></a-entity>
           <a-entity mindar-image-target="targetIndex: 4" data-country="usa">
-            <a-gltf-model id="entity-usa" src="#model-usa" scale="0.3 0.3 0.3" position="0 0.5 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
-          <a-entity mindar-image-target="targetIndex: 5" data-country="australia">
-            <a-gltf-model id="entity-australia" src="#model-australia" scale="0.15 0.15 0.15" position="0 0.5 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-usa" scale="0.3 0.3 0.3" position="0 0.5 0" visible="false"></a-gltf-model></a-entity>
+          
+            <a-entity mindar-image-target="targetIndex: 5" data-country="australia">
+            <a-gltf-model src="#model-australia" scale="0.15 0.15 0.15" position="0 0.5 0" visible="false"></a-gltf-model></a-entity>
           <a-entity mindar-image-target="targetIndex: 6" data-country="australia">
-            <a-gltf-model id="entity-australia" src="#model-australia" scale="0.15 0.15 0.15" position="0 0.5 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-australia" scale="0.15 0.15 0.15" position="0 0.5 0" visible="false"></a-gltf-model></a-entity>
+          
           <a-entity mindar-image-target="targetIndex: 7" data-country="brasil">
-           <a-gltf-model id="entity-brasil" src="#model-brasil" scale="0.015 0.015 0.015" position="0 0.3 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-brasil" scale="0.015 0.015 0.015" position="0 0.3 0" visible="false"></a-gltf-model></a-entity>
           <a-entity mindar-image-target="targetIndex: 8" data-country="brasil">
-           <a-gltf-model id="entity-brasil" src="#model-brasil" scale="0.015 0.015 0.015" position="0 0.3 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-brasil" scale="0.015 0.015 0.015" position="0 0.3 0" visible="false"></a-gltf-model></a-entity>
+          
           <a-entity mindar-image-target="targetIndex: 9" data-country="iran">
-            <a-gltf-model id="entity-iran" src="#model-iran" scale="0.08 0.08 0.08" position="0 0.46 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-iran" scale="0.08 0.08 0.08" position="0 0.46 0" visible="false"></a-gltf-model></a-entity>
           <a-entity mindar-image-target="targetIndex: 10" data-country="iran">
-            <a-gltf-model id="entity-iran" src="#model-iran" scale="0.08 0.08 0.08" position="0 0.46 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-iran" scale="0.08 0.08 0.08" position="0 0.46 0" visible="false"></a-gltf-model></a-entity>
+          
           <a-entity mindar-image-target="targetIndex: 11" data-country="japon">
-            <a-gltf-model id="entity-japon" src="#model-japon" scale="0.03 0.03 0.03" position="0 0.3 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
-           <a-entity mindar-image-target="targetIndex: 12" data-country="japon">
-            <a-gltf-model id="entity-japon" src="#model-japon" scale="0.03 0.03 0.03" position="0 0.3 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-japon" scale="0.03 0.03 0.03" position="0 0.3 0" visible="false"></a-gltf-model></a-entity>
+          <a-entity mindar-image-target="targetIndex: 12" data-country="japon">
+            <a-gltf-model src="#model-japon" scale="0.03 0.03 0.03" position="0 0.3 0" visible="false"></a-gltf-model></a-entity>
+          
           <a-entity mindar-image-target="targetIndex: 13" data-country="argentina">
-            <a-gltf-model id="entity-argentina" src="#model-argentina" scale="8.0 8.0 8.0" position="0 0.3 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-argentina" scale="8.0 8.0 8.0" position="0 0.3 0" visible="false"></a-gltf-model></a-entity>
           <a-entity mindar-image-target="targetIndex: 14" data-country="argentina">
-            <a-gltf-model id="entity-argentina" src="#model-argentina" scale="8.0 8.0 8.0" position="0 0.3 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-argentina" scale="8.0 8.0 8.0" position="0 0.3 0" visible="false"></a-gltf-model></a-entity>
+          
           <a-entity mindar-image-target="targetIndex: 15" data-country="canada">
-            <a-gltf-model id="entity-canada" src="#model-canada" scale="0.5 0.5 0.5" position="0 0.5 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-canada" scale="0.5 0.5 0.5" position="0 0.5 0" visible="false"></a-gltf-model></a-entity>
           <a-entity mindar-image-target="targetIndex: 16" data-country="canada">
-            <a-gltf-model id="entity-canada" src="#model-canada" scale="0.5 0.5 0.5" position="0 0.5 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
+            <a-gltf-model src="#model-canada" scale="0.5 0.5 0.5" position="0 0.5 0" visible="false"></a-gltf-model></a-entity>
           
           <a-entity mindar-image-target="targetIndex: 17" data-country="uzbekistan">
-            <a-gltf-model id="entity-uzbekistan" src="#model-uzbekistan" scale="0.02 0.02 0.02" position="0 0.5 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-uzbekistan" scale="0.02 0.02 0.02" position="0 0.5 0" visible="false"></a-gltf-model></a-entity>
           <a-entity mindar-image-target="targetIndex: 18" data-country="uzbekistan">
-            <a-gltf-model id="entity-uzbekistan" src="#model-uzbekistan" scale="0.02 0.02 0.02" position="0 0.5 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-uzbekistan" scale="0.02 0.02 0.02" position="0 0.5 0" visible="false"></a-gltf-model></a-entity>
+          
           <a-entity mindar-image-target="targetIndex: 19" data-country="jordan">
-            <a-gltf-model id="entity-jordan" src="#model-jordan" scale="0.18 0.18 0.18" position="0 0.4 0" 
-             visible="false"></a-gltf-model>
-          </a-entity>
-
-           <a-entity mindar-image-target="targetIndex: 20" data-country="jordan">
-            <a-gltf-model id="entity-jordan" src="#model-jordan" scale="0.18 0.18 0.18" position="0 0.4 0" 
-             visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-jordan" scale="0.18 0.18 0.18" position="0 0.4 0" visible="false"></a-gltf-model></a-entity>
+          <a-entity mindar-image-target="targetIndex: 20" data-country="jordan">
+            <a-gltf-model src="#model-jordan" scale="0.18 0.18 0.18" position="0 0.4 0" visible="false"></a-gltf-model></a-entity>
+          
           <a-entity mindar-image-target="targetIndex: 21" data-country="nuevazelan">
-            <a-gltf-model id="entity-nuevazelan" src="#model-nuevazelan" scale="0.15 0.15 0.15" position="0 0.35 0" 
-             visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-nuevazelan" scale="0.15 0.15 0.15" position="0 0.35 0" visible="false"></a-gltf-model></a-entity>
           <a-entity mindar-image-target="targetIndex: 22" data-country="nuevazelan">
-            <a-gltf-model id="entity-nuevazelan" src="#model-nuevazelan" scale="0.15 0.15 0.15" position="0 0.35 0" 
-             visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-nuevazelan" scale="0.15 0.15 0.15" position="0 0.35 0" visible="false"></a-gltf-model></a-entity>
+          
           <a-entity mindar-image-target="targetIndex: 23" data-country="ecuador">
-            <a-gltf-model id="entity-ecuador" src="#model-ecuador" scale="0.15 0.15 0.15" position="0 0.38 0" 
-             visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-ecuador" scale="0.15 0.15 0.15" position="0 0.38 0" visible="false"></a-gltf-model></a-entity>
           <a-entity mindar-image-target="targetIndex: 24" data-country="ecuador">
-            <a-gltf-model id="entity-ecuador" src="#model-ecuador" scale="0.15 0.15 0.15" position="0 0.38 0" 
-             visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-ecuador" scale="0.15 0.15 0.15" position="0 0.38 0" visible="false"></a-gltf-model></a-entity>
+          
           <a-entity mindar-image-target="targetIndex: 25" data-country="coreasur">
-            <a-gltf-model id="entity-coreasur" src="#model-coreasur" scale="0.17 0.17 0.17" position="0 0.3 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-coreasur" scale="0.17 0.17 0.17" position="0 0.3 0" visible="false"></a-gltf-model></a-entity>
           <a-entity mindar-image-target="targetIndex: 26" data-country="coreasur">
-            <a-gltf-model id="entity-coreasur" src="#model-coreasur" scale="0.17 0.17 0.17" position="0 0.3 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-coreasur" scale="0.17 0.17 0.17" position="0 0.3 0" visible="false"></a-gltf-model></a-entity>
+          
           <a-entity mindar-image-target="targetIndex: 27" data-country="colombia">
-            <a-gltf-model id="entity-colombia" src="#model-colombia" scale="0.15 0.15 0.15" position="0 0.38 0" 
-             visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-colombia" scale="0.15 0.15 0.15" position="0 0.38 0" visible="false"></a-gltf-model></a-entity>
           <a-entity mindar-image-target="targetIndex: 28" data-country="colombia">
-            <a-gltf-model id="entity-colombia" src="#model-colombia" scale="0.15 0.15 0.15" position="0 0.38 0" 
-             visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-colombia" scale="0.15 0.15 0.15" position="0 0.38 0" visible="false"></a-gltf-model></a-entity>
+          
           <a-entity mindar-image-target="targetIndex: 29" data-country="uruguay">
-            <a-gltf-model id="entity-uruguay" src="#model-uruguay" scale="0.17 0.17 0.17" position="0 0.3 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-uruguay" scale="0.17 0.17 0.17" position="0 0.3 0" visible="false"></a-gltf-model></a-entity>
           <a-entity mindar-image-target="targetIndex: 30" data-country="uruguay">
-            <a-gltf-model id="entity-uruguay" src="#model-uruguay" scale="0.17 0.17 0.17" position="0 0.3 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-uruguay" scale="0.17 0.17 0.17" position="0 0.3 0" visible="false"></a-gltf-model></a-entity>
+          
           <a-entity mindar-image-target="targetIndex: 31" data-country="paraguay">
-            <a-gltf-model id="entity-paraguay" src="#model-paraguay" scale="0.15 0.15 0.15" position="0 0.38 0" 
-             visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-paraguay" scale="0.15 0.15 0.15" position="0 0.38 0" visible="false"></a-gltf-model></a-entity>
           <a-entity mindar-image-target="targetIndex: 32" data-country="paraguay">
-            <a-gltf-model id="entity-paraguay" src="#model-paraguay" scale="0.15 0.15 0.15" position="0 0.38 0" 
-             visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-paraguay" scale="0.15 0.15 0.15" position="0 0.38 0" visible="false"></a-gltf-model></a-entity>
+          
           <a-entity mindar-image-target="targetIndex: 33" data-country="marruecos">
-            <a-gltf-model id="entity-marruecos" src="#model-marruecos" scale="0.15 0.15 0.15" position="0 0.3 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-marruecos" scale="0.15 0.15 0.15" position="0 0.3 0" visible="false"></a-gltf-model></a-entity>
           <a-entity mindar-image-target="targetIndex: 34" data-country="marruecos">
-            <a-gltf-model id="entity-marruecos" src="#model-marruecos" scale="0.12 0.12 0.12" position="0 0.3 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
+            <a-gltf-model src="#model-marruecos" scale="0.12 0.12 0.12" position="0 0.3 0" visible="false"></a-gltf-model></a-entity>
+          
           <a-entity mindar-image-target="targetIndex: 35" data-country="tunez">
-            <a-gltf-model id="entity-tunez" src="#model-tunez" scale="0.17 0.17 0.17" position="0 0 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
+            <a-gltf-model src="#model-tunez" scale="0.17 0.17 0.17" position="0 0 0" visible="false"></a-gltf-model></a-entity>
 
           <a-entity mindar-image-target="targetIndex: 36" data-country="tunez">
-            <a-gltf-model id="entity-tunez" src="#model-tunez" scale="0.17 0.17 0.17" position="0 0 0" 
-              visible="false"></a-gltf-model>
-          </a-entity>
-
-        </a-scene>
+            <a-gltf-model src="#model-tunez" scale="0.17 0.17 0.17" position="0 0 0" visible="false"></a-gltf-model></a-entity>
+        
+          </a-scene>
       `;
 
       setTimeout(() => {
@@ -1295,12 +993,7 @@
 
       initARLogic();
       resetButtons();
-
     });
-
   </script>
-
+</body>
 </html>
-
-
-
